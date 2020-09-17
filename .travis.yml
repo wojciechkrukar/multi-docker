@@ -1,0 +1,34 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t wojciechkrukar/docker-react -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run wojciechkrukar/docker-react npm run test -- --coverage
+
+after_success:
+  - docker build -t wojciechkrukar/multi-client -f ./client
+  - docker build -t wojciechkrukar/multi-nginx -f ./nginx
+  - docker build -t wojciechkrukar/multi-server -f ./server
+  - docker build -t wojciechkrukar/multi-worker -f ./worker
+
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  - docker push  wojciechkrukar/multi-client
+  - docker push  wojciechkrukar/multi-nginx
+  - docker push  wojciechkrukar/multi-server
+  - docker push  wojciechkrukar/multi-worker
+# deploy:
+#   provider: elasticbeanstalk
+#   region: "us-west-2"
+#   app: "docler-react"
+#   env: "DoclerReact-env-1"
+#   bucket_name: "elasticbeanstalk-us-west-2-149173387233"
+#   bucket_path: "docler-react"
+#   on:
+#     branch: master
+#   access_key_id: $AWS_ACCESS_KEY
+#   secret_access_key:
+#     secure: $AWS_SECRET_KEY
