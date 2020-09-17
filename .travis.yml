@@ -3,10 +3,10 @@ services:
   - docker
 
 before_install:
-  - docker build -t wojciechkrukar/docker-react -f ./client/Dockerfile.dev ./client
+  - docker build -t wojciechkrukar/docker-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run wojciechkrukar/docker-react npm run test -- --coverage
+  - docker run wojciechkrukar/docker-test npm test -- --coverage
 
 after_success:
   - docker build -t wojciechkrukar/multi-client ./client
